@@ -5,10 +5,12 @@ def img_show(img, named_win = 'img' ):
     cv2.imshow(named_win, img)
     cv2.waitKey(0)
 
-def tensor_to_numpy(img_t, normalize = 255.0):
+def tensor_to_numpy(img_t, normalize = 255.0, is_gpu = True):
     img_t = torch.squeeze(img_t,0)
     img_t = torch.squeeze(img_t,0)
     img_t = img_t * normalize
+    if is_gpu:
+        img_t = img_t.cpu()
     img_numpy = img_t.detach().numpy()
     img_numpy = np.clip(img_numpy, 0, 255)
     return img_numpy

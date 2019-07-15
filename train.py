@@ -3,7 +3,13 @@ import cv2
 from models import UNet
 import numpy as np
 import utils
-def train(net, input_noise, img, mask, optimizer, iter_num):
+def train(net, input_noise, img, mask, optimizer, iter_num, is_gpu = True):
+    if is_gpu:
+        net = net.cuda()
+        input_noise = input_noise.cuda()
+        img = img.cuda()
+        mask = mask.cuda()
+        #optimizer = optimizer.cuda()
     criterion = torch.nn.MSELoss()
     for i in range(iter_num):
         optimizer.zero_grad()
@@ -15,13 +21,14 @@ def train(net, input_noise, img, mask, optimizer, iter_num):
 
         #imshow
         output_numpy = utils.tensor_to_numpy(output).astype(np.uint8)
-        cv2.imshow('output', output_numpy)
-        cv2.waitKey(1000)
+        #cv2.imshow('output', output_numpy)
+        #cv2.waitKey(1000)
+        cv2.imwrite('output.png', output_numpy)
         #histgram
         img_numpy = utils.tensor_to_numpy(img).astype(np.uint8)
         mask_numpy = utils.tensor_to_numpy(mask, normalize=1).astype(np.uint8)
-        hist = utils.generate_histogram(img_numpy, output_numpy, mask_numpy, hist_t= 3)
-        print('hist:', hist)
+        hist = utils.generate_histogram(img_numpy, output_numpy, mask_numpy, hist_t= 10)
+        print('hist {}, hist_sum {}:'.format(hist, np.sum(hist)))
 
 
 
@@ -38,7 +45,7 @@ def main():
     #read net
     net = UNet()
     #get optimizer
-    optimizer = torch.optim.Adam(net.parameters(), lr = 0.001)
+    optimizer = torch.optim.Adam(net.parameters(), lr = 0.0001)
     #train parameter
     iter_num = 10000
     mask_size = (1,1,512,512)
