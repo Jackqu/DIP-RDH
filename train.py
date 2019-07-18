@@ -28,8 +28,10 @@ def train(net, input_noise, img, mask, optimizer, iter_num, is_gpu = False):
         #histgram
         img_numpy = utils.tensor_to_numpy(img).astype(np.uint8)
         mask_numpy = utils.tensor_to_numpy(mask, normalize=1).astype(np.uint8)
-        hist = utils.generate_histogram(img_numpy, output_numpy, mask_numpy, hist_t= 10)
-        print('hist {}, hist_sum {}:'.format(hist, np.sum(hist)))
+        hist = utils.generate_histogram(img_numpy, output_numpy, mask_numpy, mask_value=1, hist_t= 10)
+        print('hist 1 {}, hist_sum {}:'.format(hist, np.sum(hist)))
+        hist = utils.generate_histogram(img_numpy, output_numpy, mask_numpy, mask_value=0, hist_t=10)
+        print('hist 0 {}, hist_sum {}:'.format(hist, np.sum(hist)))
 
 
 
@@ -54,15 +56,17 @@ def main():
                upsample_mode='nearest', filter_skip_size=1,
                need_sigmoid=True, need_bias=True, pad=pad, act_fun='LeakyReLU')
     #get optimizer
-    optimizer = torch.optim.Adam(net.parameters(), lr = 0.001)
+    lr = 0.0001
+    optimizer = torch.optim.Adam(net.parameters(), lr = lr)
     #train parameter
     iter_num = 10000
     mask_size = (1,1,512,512)
     is_even = True
     mask = utils.generate_mask(mask_size, is_even)
     input_noise = torch.randn(*mask_size)
+    is_gpu = True
     #trian
-    train(net, input_noise, img, mask, optimizer,iter_num)
+    train(net, input_noise, img, mask, optimizer,iter_num, is_gpu)
 
 
 

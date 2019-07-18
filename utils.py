@@ -32,7 +32,7 @@ def generate_mask(mask_size, is_even = True):
     return mask
 
 
-def generate_histogram(img, predict, mask, hist_t = 3):
+def generate_histogram(img, predict, mask, mask_value = 1, hist_t = 3):
     """
 
     :param img:
@@ -42,7 +42,7 @@ def generate_histogram(img, predict, mask, hist_t = 3):
     :return:
     """
     diff = np.abs(img - predict)
-    index = mask == 1
+    index = mask == mask_value
     diff = diff[index]
     hist = []
     for i in range(hist_t):
